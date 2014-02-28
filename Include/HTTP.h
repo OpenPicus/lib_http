@@ -1,4 +1,4 @@
-/** \file HTTPlib.h
+/** \file HTTP.h
  *  \brief HTTP library
  */
 

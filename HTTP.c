@@ -1,4 +1,4 @@
-/** \file HTTPlib.c
+/** \file HTTP.c
  *  \brief HTTP library
  */
 
@@ -8,7 +8,7 @@
  *
  *            openSource wireless Platform for sensors and Internet of Things
  * **************************************************************************
- *  FileName:        HTTPlib.c
+ *  FileName:        HTTP.c
  *  Module:          FlyPort
  *  Compiler:        Microchip C30 v3.12 or higher
  *
