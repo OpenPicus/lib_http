@@ -8,12 +8,10 @@
  Library to manage HTTP requests.
 */
 
-#include "taskFlyport.h"
-
 #define ARRAY_SIZE(x) (sizeof(x))
 
 /*****************************************************************************
-        MQTT function declarations
+        HTTP function declarations
 *****************************************************************************/
 
 int HTTP_GET(TCP_SOCKET socket, char * host, char * path_data, char * custom_header, char * header, int headersize, char * body, int bodysize, int timeout);

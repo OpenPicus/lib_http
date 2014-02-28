@@ -57,9 +57,70 @@
 The HTTP library contains all the commands to send an HTTP request (POST and GET) and to read the response.
 */
 
-#include "HTTPlib.h"
+#include "taskFlyport.h"
+#include "HTTP.h"
 
 static char hex[] = {'\x24','\x26','\x2B','\x2C','\x2F','\x3A','\x3B','\x3D','\x3F','\x40','\x20','\x22','\x3C','\x3E','\x23','\x25','\x7B','\x7D','\x7C','\x5C','\x5E','\x7E','\x5B','\x5D','\x60'};
+
+/// @cond
+int HTTP_Read(TCP_SOCKET socket, char * header, int headersize, char * body, int bodysize, int timeout)
+{
+	int rn=0;
+	BOOL fB=0;
+	int cnt=0;
+	int k=0;
+	char bff[2];
+	int i=0;
+	int nCODE=0;
+	char code[4];
+	
+	header[0]='\0';
+	int cntheader = 0;
+	
+	while(TCPRxLen(socket)<1&&cnt<timeout/10)
+	{
+		vTaskDelay(10);
+		cnt++;
+	}
+	if(cnt==timeout/10)
+		return 0;
+	else
+	{
+		while(TCPRxLen(socket)>0&&k==0)
+		{
+			if(fB==0)
+			{
+				TCPRead(socket,bff,1);
+				nCODE++;
+				
+				if(cntheader<headersize-1)
+				{					
+					strcat(header,bff);
+					cntheader++;
+				}
+				if(bff[0]=='\r'||bff[0]=='\n')
+					rn++;
+				else
+				{				
+					if(nCODE>9&&nCODE<13)
+						code[i++]=bff[0];
+					rn=0;
+				}
+				if(rn==4&&fB==0)
+					fB=1;
+			}
+			else
+			{
+				if((k=TCPRxLen(socket))>=bodysize)
+					TCPRead(socket,body,bodysize-1);
+				else
+					TCPRead(socket,body,k);
+			}	
+		}
+		return atoi(code);
+	}			
+}
+/// @endcond
 
 /**
  * Function to send a GET request and to receive the response
@@ -257,63 +318,3 @@ int HTTP_URLDecodeLen(char * str)
 	}
 	return lenURL+1;
 }
-
-/// @cond
-int HTTP_Read(TCP_SOCKET socket, char * header, int headersize, char * body, int bodysize, int timeout)
-{
-	int rn=0;
-	BOOL fB=0;
-	int cnt=0;
-	int k=0;
-	char bff[2];
-	int i=0;
-	int nCODE=0;
-	char code[4];
-	
-	header[0]='\0';
-	int cntheader = 0;
-	
-	while(TCPRxLen(socket)<1&&cnt<timeout/10)
-	{
-		vTaskDelay(10);
-		cnt++;
-	}
-	if(cnt==timeout/10)
-		return 0;
-	else
-	{
-		while(TCPRxLen(socket)>0&&k==0)
-		{
-			if(fB==0)
-			{
-				TCPRead(socket,bff,1);
-				nCODE++;
-				
-				if(cntheader<headersize-1)
-				{					
-					strcat(header,bff);
-					cntheader++;
-				}
-				if(bff[0]=='\r'||bff[0]=='\n')
-					rn++;
-				else
-				{				
-					if(nCODE>9&&nCODE<13)
-						code[i++]=bff[0];
-					rn=0;
-				}
-				if(rn==4&&fB==0)
-					fB=1;
-			}
-			else
-			{
-				if((k=TCPRxLen(socket))>=bodysize)
-					TCPRead(socket,body,bodysize-1);
-				else
-					TCPRead(socket,body,k);
-			}	
-		}
-		return atoi(code);
-	}			
-}
-/// @endcond
