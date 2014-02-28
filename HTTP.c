@@ -72,6 +72,7 @@ static char hex[] = {'\x24','\x26','\x2B','\x2C','\x2F','\x3A','\x3B','\x3D','\x
  * \param body - pointer in which to store the body response
  * \param bodysize - length of the body array (use ARRAY_SIZE(body))
  * \param timeout - timeout period in 10ms
+ * \return the HTTP code or 0 for timeout
  */
 int HTTP_GET(TCP_SOCKET socket, char * host, char * path_data, char * custom_header, char * header, int headersize, char * body, int bodysize, int timeout) //multipli di 10ms come vTaskDelay
 {
@@ -95,6 +96,7 @@ int HTTP_GET(TCP_SOCKET socket, char * host, char * path_data, char * custom_hea
  * \param headersize - length of the header array (use ARRAY_SIZE(header))
  * \param body - pointer in which to store the body response
  * \param bodysize - length of the body array (use ARRAY_SIZE(body))
+ * \return the HTTP code or 0 for timeout
  */
 int HTTP_GETsimple(TCP_SOCKET socket, char * host, char * path_data, char * header, int headersize, char * body, int bodysize)
 {
@@ -114,6 +116,7 @@ int HTTP_GETsimple(TCP_SOCKET socket, char * host, char * path_data, char * head
  * \param body - pointer in which to store the body response
  * \param bodysize - length of the body array (use ARRAY_SIZE(body))
  * \param timeout - timeout period in 10ms
+ * \return the HTTP code or 0 for timeout
  */
 int HTTP_POST(TCP_SOCKET socket, char * host, char * path, char * custom_header, char * CType, char * data, char * header, int headersize, char * body, int bodysize, int timeout) //multipli di 10ms come vTaskDelay
 {
@@ -138,6 +141,7 @@ int HTTP_POST(TCP_SOCKET socket, char * host, char * path, char * custom_header,
  * \param headersize - length of the header array (use ARRAY_SIZE(header))
  * \param body - pointer in which to store the body response
  * \param bodysize - length of the body array (use ARRAY_SIZE(body))
+ * \return the HTTP code or 0 for timeout
  */
 int HTTP_POSTsimple(TCP_SOCKET socket, char * host, char * path, char * data, char * header, int headersize, char * body, int bodysize) //multipli di 10ms come vTaskDelay
 {
@@ -180,6 +184,7 @@ void HTTP_URLEncode(char * dest, char * src)
 /**
  * Function to calculate the length of the future URL string
  * \param str - string with the text to calculate
+ * \return the length of the future URL string
  */
 int HTTP_URLEncodeLen(char * str)
 {
@@ -235,6 +240,7 @@ void HTTP_URLDecode(char * dest, char * src)
 /**
  * Function to calculate the length of the future no-URL string
  * \param str - string with the text to calculate
+ * \return the length of the future no-URL string
  */
 int HTTP_URLDecodeLen(char * str)
 {
