@@ -1,4 +1,4 @@
-/** \file HTTP.c
+/** \file HTTPlib.c
  *  \brief HTTP library
  */
 
@@ -8,7 +8,7 @@
  *
  *            openSource wireless Platform for sensors and Internet of Things
  * **************************************************************************
- *  FileName:        HTTP.c
+ *  FileName:        HTTPlib.c
  *  Module:          FlyPort
  *  Compiler:        Microchip C30 v3.12 or higher
  *
@@ -58,7 +58,7 @@ The HTTP library contains all the commands to send an HTTP request (POST and GET
 */
 
 #include "taskFlyport.h"
-#include "HTTP.h"
+#include "HTTPlib.h"
 
 static char hex[] = {'\x24','\x26','\x2B','\x2C','\x2F','\x3A','\x3B','\x3D','\x3F','\x40','\x20','\x22','\x3C','\x3E','\x23','\x25','\x7B','\x7D','\x7C','\x5C','\x5E','\x7E','\x5B','\x5D','\x60'};
 
