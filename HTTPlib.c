@@ -135,7 +135,7 @@ int HTTP_Read(TCP_SOCKET socket, char * header, int headersize, char * body, int
  * \param timeout - timeout period in 10ms
  * \return the HTTP code or 0 for timeout
  */
-int HTTP_GET(TCP_SOCKET socket, char * host, char * path_data, char * custom_header, char * header, int headersize, char * body, int bodysize, int timeout) //multipli di 10ms come vTaskDelay
+int HTTP_Get(TCP_SOCKET socket, char * host, char * path_data, char * custom_header, char * header, int headersize, char * body, int bodysize, int timeout) //multipli di 10ms come vTaskDelay
 {
 	char request[strlen(host)+strlen(path_data)+strlen(custom_header)+50];
 
@@ -159,9 +159,9 @@ int HTTP_GET(TCP_SOCKET socket, char * host, char * path_data, char * custom_hea
  * \param bodysize - length of the body array (use ARRAY_SIZE(body))
  * \return the HTTP code or 0 for timeout
  */
-int HTTP_GETsimple(TCP_SOCKET socket, char * host, char * path_data, char * header, int headersize, char * body, int bodysize)
+int HTTP_GetSimple(TCP_SOCKET socket, char * host, char * path_data, char * header, int headersize, char * body, int bodysize)
 {
-	return HTTP_GET(socket, host, path_data, "", header, headersize, body, bodysize, 200);
+	return HTTP_Get(socket, host, path_data, "", header, headersize, body, bodysize, 200);
 }
 
 /**
@@ -179,7 +179,7 @@ int HTTP_GETsimple(TCP_SOCKET socket, char * host, char * path_data, char * head
  * \param timeout - timeout period in 10ms
  * \return the HTTP code or 0 for timeout
  */
-int HTTP_POST(TCP_SOCKET socket, char * host, char * path, char * custom_header, char * CType, char * data, char * header, int headersize, char * body, int bodysize, int timeout) //multipli di 10ms come vTaskDelay
+int HTTP_Post(TCP_SOCKET socket, char * host, char * path, char * custom_header, char * CType, char * data, char * header, int headersize, char * body, int bodysize, int timeout) //multipli di 10ms come vTaskDelay
 {
 	char request[strlen(host)+strlen(path)+strlen(custom_header)+strlen(CType)+strlen(data)+100];
 
@@ -204,9 +204,9 @@ int HTTP_POST(TCP_SOCKET socket, char * host, char * path, char * custom_header,
  * \param bodysize - length of the body array (use ARRAY_SIZE(body))
  * \return the HTTP code or 0 for timeout
  */
-int HTTP_POSTsimple(TCP_SOCKET socket, char * host, char * path, char * data, char * header, int headersize, char * body, int bodysize) //multipli di 10ms come vTaskDelay
+int HTTP_PostSimple(TCP_SOCKET socket, char * host, char * path, char * data, char * header, int headersize, char * body, int bodysize) //multipli di 10ms come vTaskDelay
 {
-	return HTTP_POST(socket, host, path, "", "application/x-www-form-urlencoded", data, header, headersize, body, bodysize, 200);
+	return HTTP_Post(socket, host, path, "", "application/x-www-form-urlencoded", data, header, headersize, body, bodysize, 200);
 }
 
 /**
