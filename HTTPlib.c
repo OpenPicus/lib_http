@@ -185,7 +185,7 @@ int HTTP_Post(TCP_SOCKET socket, char * host, char * path, char * custom_header,
 
 	TCPRxFlush(socket);
 	
-	sprintf(request,"POST %s HTTP/1.1\r\nHOST: %s\r\nContent-Type: %s\r\nContent-Length: %d\r\n%s\r\n%s\r\n\r\n", path, host, CType, strlen(data), custom_header,data);
+	sprintf(request,"POST %s HTTP/1.1\r\nHOST: %s\r\nContent-Type: %s\r\nContent-Length: %d\r\n%s\r\n%s\r\n", path, host, CType, strlen(data), custom_header,data);
 	UARTWrite(1,request);
 	
 	TCPWrite(socket,request,strlen(request));
@@ -207,6 +207,33 @@ int HTTP_Post(TCP_SOCKET socket, char * host, char * path, char * custom_header,
 int HTTP_PostSimple(TCP_SOCKET socket, char * host, char * path, char * data, char * header, int headersize, char * body, int bodysize) //multipli di 10ms come vTaskDelay
 {
 	return HTTP_Post(socket, host, path, "", "application/x-www-form-urlencoded", data, header, headersize, body, bodysize, 200);
+}
+
+/**
+ * Function to send a PUT request and to receive the response
+ * \param socket - the handle of the socket to use
+ * \param host - string with the host (server)
+ * \param path - string with the path (of file), e.g. "/index.php"
+ * \param custom_header - string with custom headers (must include "\r\n", null header = "")
+ * \param data - string with the data, e.g. "param1=val1&param2=val2"
+ * \param header - pointer in which to store the header response
+ * \param headersize - length of the header array (use ARRAY_SIZE(header))
+ * \param body - pointer in which to store the body response
+ * \param bodysize - length of the body array (use ARRAY_SIZE(body))
+ * \param timeout - timeout period in 10ms
+ * \return the HTTP code or 0 for timeout
+ */
+int HTTP_Put(TCP_SOCKET socket, char * host, char * path, char * custom_header, char * data, char * header, int headersize, char * body, int bodysize, int timeout) //multipli di 10ms come vTaskDelay
+{
+	char request[strlen(host)+strlen(path)+strlen(custom_header)+strlen(data)+100];
+
+	TCPRxFlush(socket);
+	
+	sprintf(request,"PUT %s HTTP/1.1\r\nHOST: %s\r\nContent-Length: %d\r\n%s\r\n%s\r\n", path, host, strlen(data), custom_header,data);
+	UARTWrite(1,request);
+	
+	TCPWrite(socket,request,strlen(request));
+	return HTTP_Read(socket, header, headersize, body, bodysize, timeout);
 }
 
 /**
@@ -240,33 +267,6 @@ void HTTP_URLEncode(char * dest, char * src)
 			dest[j++]=src[i];
 	}
 	dest[j++]='\0';
-}
-
-/**
- * Function to send a PUT request and to receive the response
- * \param socket - the handle of the socket to use
- * \param host - string with the host (server)
- * \param path - string with the path (of file), e.g. "/index.php"
- * \param custom_header - string with custom headers (must include "\r\n", null header = "")
- * \param data - string with the data, e.g. "param1=val1&param2=val2"
- * \param header - pointer in which to store the header response
- * \param headersize - length of the header array (use ARRAY_SIZE(header))
- * \param body - pointer in which to store the body response
- * \param bodysize - length of the body array (use ARRAY_SIZE(body))
- * \param timeout - timeout period in 10ms
- * \return the HTTP code or 0 for timeout
- */
-int HTTP_Put(TCP_SOCKET socket, char * host, char * path, char * custom_header, char * data, char * header, int headersize, char * body, int bodysize, int timeout) //multipli di 10ms come vTaskDelay
-{
-	char request[strlen(host)+strlen(path)+strlen(custom_header)+strlen(data)+100];
-
-	TCPRxFlush(socket);
-	
-	sprintf(request,"PUT %s HTTP/1.1\r\nHOST: %s\r\nContent-Length: %d\r\n%s\r\n%s\r\n\r\n", path, host, strlen(data), custom_header,data);
-	UARTWrite(1,request);
-	
-	TCPWrite(socket,request,strlen(request));
-	return HTTP_Read(socket, header, headersize, body, bodysize, timeout);
 }
 
 /**
