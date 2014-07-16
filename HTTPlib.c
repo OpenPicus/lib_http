@@ -14,7 +14,7 @@
  *
  *  Author               Rev.    Date              Comment
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *  Stefano Saccucci     1.0     02/21/2014        First release  (core team)
+ *  Stefano Saccucci     2.0     02/21/2014        First release  (core team)
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  *  Software License Agreement
@@ -62,63 +62,74 @@ The HTTP library contains all the commands to send an HTTP request (POST and GET
 
 static char hex[] = {'\x24','\x26','\x2B','\x2C','\x2F','\x3A','\x3B','\x3D','\x3F','\x40','\x20','\x22','\x3C','\x3E','\x23','\x25','\x7B','\x7D','\x7C','\x5C','\x5E','\x7E','\x5B','\x5D','\x60'};
 
+__eds__ char eds_space[HTTP_MAX_SIZE] __attribute__((eds));
+
 /// @cond
 int HTTP_Read(TCP_SOCKET socket, char * header, int headersize, char * body, int bodysize, int timeout)
 {
-	int rn=0;
-	BOOL fB=0;
-	int cnt=0;
-	int k=0;
-	char bff[2];
-	int i=0;
-	int nCODE=0;
-	char code[4];
+	int cnt = 0, len = 0, len1=0, len2=0, crlf = 0, i, j;
+	char code[4], bff[505];
 	
-	header[0]='\0';
-	int cntheader = 0;
-	
-	while(TCPRxLen(socket)<1&&cnt<timeout/10)
+	while( (TCPRxLen(socket) < 15) && (cnt < timeout/10) )
 	{
-		vTaskDelay(10);
-		cnt++;
+		vTaskDelay(1);
+		cnt++; 
 	}
-	if(cnt==timeout/10)
-		return 0;
-	else
+
+	if(cnt == timeout/10)
+		return READ_TIMEOUT;
+	
+	while((len=TCPRxLen(socket))>0)
 	{
-		while(TCPRxLen(socket)>0&&k==0)
+		if(len>500)
+			len=500;
+		TCPRead(socket, bff, len);
+		len1=len1+len;
+		if(len1>=HTTP_MAX_SIZE)
+			len1=HTTP_MAX_SIZE-1;
+		for(cnt=len2;cnt<len1;cnt++)
+			eds_space[cnt]=bff[cnt-len2];
+		len2=len1;
+		if(len1==HTTP_MAX_SIZE-1)
+			break;
+	}
+
+	eds_space[len2]='\0';
+	
+	for(j=9; j<12; j++)
+		code[j-9] = eds_space[j];
+	code[3] = '\0';
+	
+	for(i=0;i<len2;i++)
+	{
+		if(crlf==4)
+			break;
+		if( (eds_space[i] == '\r') || (eds_space[i] == '\n'))
+			crlf++;
+		else
+			crlf=0;
+	}
+	for(j=0;j<i;j++)
+	{
+		if(j==headersize)
+			break;
+		header[j]=eds_space[j];
+	}
+	header[j]='\0';
+
+	if(crlf==4)
+	{
+		for(j=i;j<len2;j++)
 		{
-			if(fB==0)
-			{
-				TCPRead(socket,bff,1);
-				nCODE++;
-				
-				if(cntheader<headersize-1)
-				{					
-					strcat(header,bff);
-					cntheader++;
-				}
-				if(bff[0]=='\r'||bff[0]=='\n')
-					rn++;
-				else
-				{				
-					if(nCODE>9&&nCODE<13)
-						code[i++]=bff[0];
-					rn=0;
-				}
-				if(rn==4&&fB==0)
-					fB=1;
-			}
-			else
-			{
-				if((k=TCPRxLen(socket))>=bodysize)
-					TCPRead(socket,body,bodysize-1);
-				else
-					TCPRead(socket,body,k);
-			}	
+			if(j-i==bodysize)
+				break;
+			body[j-i]=eds_space[j];
 		}
-		return atoi(code);
-	}			
+	}
+	body[j-i]='\0';
+
+	return atoi(code);
+			
 }
 /// @endcond
 

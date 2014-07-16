@@ -8,7 +8,14 @@
  Library to manage HTTP requests.
 */
 
-#define ARRAY_SIZE(x) (sizeof(x))
+#define ARRAY_SIZE(x) (sizeof(x)-1)
+
+#define HTTP_MAX_SIZE 5000
+
+#define READ_TIMEOUT 0
+#define OK_200 200
+#define CREATED_201 201
+#define FORBIDDEN_403 403
 
 /*****************************************************************************
         HTTP function declarations
